@@ -1,4 +1,6 @@
 <Solution>
   <Project Path="Maresa.API/Maresa.API.csproj" />
+  <Project Path="Maresa.Application/Maresa.Application.csproj" />
   <Project Path="Maresa.Domain/Maresa.Domain.csproj" />
+  <Project Path="Maresa.Infrastructure/Maresa.Infrastructure.csproj" />
 </Solution>
