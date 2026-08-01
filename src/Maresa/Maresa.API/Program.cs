@@ -1,5 +1,6 @@
 using Maresa.Application.Interfaces;
 using Maresa.Infrastructure.Data;
+using Maresa.Infrastructure.ExternalServices;
 using Maresa.Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore;
 
@@ -16,6 +17,12 @@ builder.Services.AddDbContext<MaresaDbContext>(options =>
 
 builder.Services.AddScoped<IPedidoRepository, PedidoRepository>();
 builder.Services.AddScoped<IAuditoriaRepository, AuditoriaRepository>();
+
+builder.Services.AddHttpClient<IClienteValidacionService, ClienteValidacionService>(client =>
+{
+    client.BaseAddress = new Uri("https://jsonplaceholder.typicode.com/");
+    client.Timeout = TimeSpan.FromSeconds(10);
+});
 
 var app = builder.Build();
 
