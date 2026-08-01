@@ -58,3 +58,5 @@ nunit-*.xml
 /src/Maresa/.vs
 /src/Maresa/Maresa.API/appsettings.Development.json
 *.csproj.user
+
+doc/
