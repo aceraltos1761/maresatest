@@ -1,3 +1,4 @@
+using Maresa.API.Logging;
 using Maresa.API.Middleware;
 using Maresa.Application.Interfaces;
 using Maresa.Application.Services;
@@ -7,6 +8,8 @@ using Maresa.Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Logging.AddFileLogger(Path.Combine(builder.Environment.ContentRootPath, "logs", "maresa.log"));
 
 // Add services to the container.
 

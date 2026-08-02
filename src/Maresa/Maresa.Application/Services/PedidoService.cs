@@ -2,6 +2,7 @@ using Maresa.Application.DTOs;
 using Maresa.Application.Interfaces;
 using Maresa.Domain.Entities;
 using Maresa.Domain.Exceptions;
+using Microsoft.Extensions.Logging;
 
 namespace Maresa.Application.Services;
 
@@ -11,21 +12,26 @@ public class PedidoService : IPedidoService
     private readonly IAuditoriaRepository _auditoriaRepository;
     private readonly IClienteValidacionService _clienteValidacionService;
     private readonly IUnitOfWork _unitOfWork;
+    private readonly ILogger<PedidoService> _logger;
 
     public PedidoService(
         IPedidoRepository pedidoRepository,
         IAuditoriaRepository auditoriaRepository,
         IClienteValidacionService clienteValidacionService,
-        IUnitOfWork unitOfWork)
+        IUnitOfWork unitOfWork,
+        ILogger<PedidoService> logger)
     {
         _pedidoRepository = pedidoRepository;
         _auditoriaRepository = auditoriaRepository;
         _clienteValidacionService = clienteValidacionService;
         _unitOfWork = unitOfWork;
+        _logger = logger;
     }
 
     public async Task<PedidoResponse> RegistrarPedidoAsync(PedidoRequest request, CancellationToken cancellationToken = default)
     {
+        _logger.LogInformation("Inicio de registro de pedido para el cliente {ClienteId}", request.ClienteId);
+
         await _unitOfWork.BeginTransactionAsync(cancellationToken);
 
         try
@@ -78,6 +84,8 @@ public class PedidoService : IPedidoService
 
             await _unitOfWork.CommitAsync(cancellationToken);
 
+            _logger.LogInformation("Pedido {PedidoId} confirmado correctamente para el cliente {ClienteId}", pedido.Id, pedido.ClienteId);
+
             return new PedidoResponse
             {
                 Id = pedido.Id,
@@ -94,8 +102,9 @@ public class PedidoService : IPedidoService
                 }).ToList()
             };
         }
-        catch
+        catch (Exception ex)
         {
+            _logger.LogError(ex, "Error al registrar el pedido para el cliente {ClienteId}", request.ClienteId);
             await _unitOfWork.RollbackAsync(cancellationToken);
             throw;
         }
