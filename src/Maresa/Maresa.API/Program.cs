@@ -1,4 +1,5 @@
 using Maresa.Application.Interfaces;
+using Maresa.Application.Services;
 using Maresa.Infrastructure.Data;
 using Maresa.Infrastructure.ExternalServices;
 using Maresa.Infrastructure.Repositories;
@@ -17,6 +18,8 @@ builder.Services.AddDbContext<MaresaDbContext>(options =>
 
 builder.Services.AddScoped<IPedidoRepository, PedidoRepository>();
 builder.Services.AddScoped<IAuditoriaRepository, AuditoriaRepository>();
+builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+builder.Services.AddScoped<IPedidoService, PedidoService>();
 
 builder.Services.AddHttpClient<IClienteValidacionService, ClienteValidacionService>(client =>
 {
