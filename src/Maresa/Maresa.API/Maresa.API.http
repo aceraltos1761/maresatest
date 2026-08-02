@@ -1,1 +1,69 @@
 @Maresa.API_HostAddress = http://localhost:5292
+
+### Caso 1 - Exito: cliente valido (jsonplaceholder tiene usuarios con id 1-10), items validos
+# Esperado: 201 Created con el pedido registrado
+POST {{Maresa.API_HostAddress}}/api/pedidos
+Content-Type: application/json
+
+{
+  "clienteId": 1,
+  "usuario": "usuario.prueba",
+  "items": [
+    { "productoId": 1, "cantidad": 2, "precio": 10 },
+    { "productoId": 2, "cantidad": 1, "precio": 20 }
+  ]
+}
+
+### Caso 2 - Cliente invalido: id fuera del rango 1-10 de jsonplaceholder
+# Esperado: 400 Bad Request (ClienteInvalidoException via middleware)
+POST {{Maresa.API_HostAddress}}/api/pedidos
+Content-Type: application/json
+
+{
+  "clienteId": 999,
+  "usuario": "usuario.prueba",
+  "items": [
+    { "productoId": 1, "cantidad": 1, "precio": 5 }
+  ]
+}
+
+### Caso 3 - Datos invalidos: sin items
+# Esperado: 400 Bad Request (validacion de ModelState, sin llegar a PedidoService)
+POST {{Maresa.API_HostAddress}}/api/pedidos
+Content-Type: application/json
+
+{
+  "clienteId": 1,
+  "usuario": "usuario.prueba",
+  "items": []
+}
+
+### Caso 4 - Datos invalidos: cantidad y precio no positivos
+# Esperado: 400 Bad Request (validacion de ModelState)
+POST {{Maresa.API_HostAddress}}/api/pedidos
+Content-Type: application/json
+
+{
+  "clienteId": 1,
+  "usuario": "usuario.prueba",
+  "items": [
+    { "productoId": 1, "cantidad": 0, "precio": -5 }
+  ]
+}
+
+### Caso 5 - Falla del servicio externo de validacion
+# jsonplaceholder.typicode.com es un servicio real, por lo que este caso no se puede forzar
+# de forma determinista con una sola request. Para reproducirlo: cortar la conexion a
+# internet, o cambiar temporalmente la BaseAddress configurada en Program.cs por una URL
+# invalida (ej. https://servicio-inexistente.invalid/) y reiniciar la API.
+# Esperado: 502 Bad Gateway (ClienteValidacionException via middleware)
+POST {{Maresa.API_HostAddress}}/api/pedidos
+Content-Type: application/json
+
+{
+  "clienteId": 1,
+  "usuario": "usuario.prueba",
+  "items": [
+    { "productoId": 1, "cantidad": 1, "precio": 5 }
+  ]
+}

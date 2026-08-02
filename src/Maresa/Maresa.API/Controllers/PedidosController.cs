@@ -16,6 +16,10 @@ public class PedidosController : ControllerBase
     }
 
     [HttpPost]
+    [ProducesResponseType(typeof(PedidoResponse), StatusCodes.Status201Created)]
+    [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status502BadGateway)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
     public async Task<ActionResult<PedidoResponse>> Post([FromBody] PedidoRequest request, CancellationToken cancellationToken)
     {
         var response = await _pedidoService.RegistrarPedidoAsync(request, cancellationToken);
