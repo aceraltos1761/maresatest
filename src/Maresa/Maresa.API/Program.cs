@@ -1,3 +1,4 @@
+using Maresa.API.Middleware;
 using Maresa.Application.Interfaces;
 using Maresa.Application.Services;
 using Maresa.Infrastructure.Data;
@@ -30,6 +31,8 @@ builder.Services.AddHttpClient<IClienteValidacionService, ClienteValidacionServi
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
+app.UseMiddleware<ExceptionHandlingMiddleware>();
+
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
