@@ -43,9 +43,9 @@ public class PedidoService : IPedidoService
                 Descripcion = $"Se recibio una solicitud de pedido para el cliente {request.ClienteId}."
             }, cancellationToken);
 
-            var clienteValido = await _clienteValidacionService.ValidarClienteAsync(request.ClienteId, cancellationToken);
+            var username = await _clienteValidacionService.ValidarClienteAsync(request.ClienteId, cancellationToken);
 
-            if (!clienteValido)
+            if (username is null)
             {
                 throw new ClienteInvalidoException($"El cliente {request.ClienteId} no es valido.");
             }
@@ -54,13 +54,13 @@ public class PedidoService : IPedidoService
             {
                 Fecha = DateTime.UtcNow,
                 Evento = "ClienteValidado",
-                Descripcion = $"El cliente {request.ClienteId} fue validado correctamente."
+                Descripcion = $"El cliente {request.ClienteId} fue validado correctamente (usuario: {username})."
             }, cancellationToken);
 
             var pedido = new PedidoCabecera
             {
                 ClienteId = request.ClienteId,
-                Usuario = request.Usuario,
+                Usuario = username,
                 Fecha = DateTime.UtcNow,
                 Estado = EstadoPedido.Confirmado,
                 Total = request.Items.Sum(item => item.Cantidad * item.Precio),

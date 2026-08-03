@@ -45,7 +45,7 @@ public class PedidoServiceTests
 
         _clienteValidacionServiceMock
             .Setup(s => s.ValidarClienteAsync(request.ClienteId, It.IsAny<CancellationToken>()))
-            .ReturnsAsync(true);
+            .ReturnsAsync("Bret");
 
         _pedidoRepositoryMock
             .Setup(r => r.AgregarAsync(It.IsAny<PedidoCabecera>(), It.IsAny<CancellationToken>()))
@@ -57,6 +57,7 @@ public class PedidoServiceTests
         Assert.Equal(42, response.Id);
         Assert.Equal(40m, response.Total);
         Assert.Equal("Confirmado", response.Estado);
+        Assert.Equal("Bret", response.Usuario);
         Assert.Equal(2, response.Items.Count);
 
         _pedidoRepositoryMock.Verify(r => r.AgregarAsync(It.IsAny<PedidoCabecera>(), It.IsAny<CancellationToken>()), Times.Once);
@@ -89,7 +90,7 @@ public class PedidoServiceTests
 
         _clienteValidacionServiceMock
             .Setup(s => s.ValidarClienteAsync(request.ClienteId, It.IsAny<CancellationToken>()))
-            .ReturnsAsync(false);
+            .ReturnsAsync((string?)null);
 
         await Assert.ThrowsAsync<ClienteInvalidoException>(() => _sut.RegistrarPedidoAsync(request, CancellationToken.None));
 

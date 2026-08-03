@@ -14,7 +14,7 @@ public class ClienteValidacionService : IClienteValidacionService
         _httpClient = httpClient;
     }
 
-    public async Task<bool> ValidarClienteAsync(int clienteId, CancellationToken cancellationToken = default)
+    public async Task<string?> ValidarClienteAsync(int clienteId, CancellationToken cancellationToken = default)
     {
         HttpResponseMessage response;
 
@@ -35,7 +35,7 @@ public class ClienteValidacionService : IClienteValidacionService
         {
             if (response.StatusCode == HttpStatusCode.NotFound)
             {
-                return false;
+                return null;
             }
 
             if (!response.IsSuccessStatusCode)
@@ -49,7 +49,13 @@ public class ClienteValidacionService : IClienteValidacionService
             try
             {
                 using var documento = JsonDocument.Parse(contenido);
-                return documento.RootElement.TryGetProperty("id", out _);
+
+                if (!documento.RootElement.TryGetProperty("username", out var usernameElement))
+                {
+                    throw new ClienteValidacionException("El servicio de validacion de clientes no devolvio el username.");
+                }
+
+                return usernameElement.GetString();
             }
             catch (JsonException ex)
             {
